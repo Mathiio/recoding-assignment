@@ -1,34 +1,32 @@
-let canvasWidth = 800;
-let canvasHeight = 600;
-let densityMap = [];
-let sizeRec = 4;
+const GRAY_SCALE = [
+  [0, 0, 0],
+  [40, 40, 40],
+  [100, 100, 100],
+  [255, 255, 255]
+];
 
 function setup() {
-  createCanvas(canvasWidth, canvasHeight);
-  background(255);
-  
-  // Créé une map de densités
-  for(let x = 0; x < canvasWidth; x++) {
-    densityMap[x] = [];
-    for(let y = 0; y < canvasHeight; y++) {
-      let density = noise(x/90, y/40) * 28; 
-      densityMap[x][y] = density;
-    }
-  }
+  createCanvas(600, 400);
   noStroke();
-  for(let x = 0; x < canvasWidth; x += sizeRec) {
-    for(let y = 0; y < canvasHeight; y += sizeRec) {
-      // Détermine si la couleur est du blanc ou du noir en fonction de la map de densités
-      let threshold = map(densityMap[x][y], 0, 20, 0, 1); 
-      let color1 = random() > threshold ? 0 : 255; // Si la valeur random est supérieur à la valeur générée par la map de desnités alors le rectangle est noir, sinon blanc
-      
-      if (color1 == 0) {
-        fill(0);
-      } else {
-        fill(255);
-      }
-      
-      rect(x, y, sizeRec, sizeRec);
-    }
+  background(255);
+  drawSquare(0, 0, width, height, 0);
+}
+
+function draw() {}
+
+function drawSquare(x, y, w, h, level) {
+  if (level < 7) {
+    let subW = w / 2;
+    let subH = h / 2;
+    drawSquare(x, y, subW, subH, level + 1);
+    drawSquare(x + subW, y, subW, subH, level + 1);
+    drawSquare(x + subW, y + subH, subW, subH, level + 1);
+    drawSquare(x, y + subH, subW, subH, level + 1);
+  } else {
+    let noiseVal = noise(x / 100, y / 100);
+    let grayIndex = Math.random() < 0.4 + noiseVal * 0.4 ? 3 : Math.floor(random(3));
+    fill(color(...GRAY_SCALE[grayIndex]));
+    noStroke(); 
+    rect(x, y, w, h);
   }
 }
